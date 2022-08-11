@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <style type="text/css">
+        body, html,#allmap {width: 100%;height: 100%;overflow: hidden;margin:0;font-family:"微软雅黑";}
+
+    </style>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=Vurw3LBoBZQwgxGFTnIQOMf0mQf4CGdh"></script>
+    <title>GPS转百度</title>
+
+
+</head>
+<body>
+    <div id="allmap">
+        </div>
+</body>
+</html>
+<script src="./qwebchannel.js"></script>
+<script type="text/javascript">
+    // 百度地图API功能
+    //地图初始化
+    
+	var jsClassIns;
+	// 获取qt中 JsClass 类的实例
+
+	new QWebChannel(qt.webChannelTransport, function(channel){
+		jsClassIns= channel.objects.jsClass; //名字和 webChannel.registerObject("jsClass", &jsClass); 第一个参数保持一致
+	});
+
+
+    
+    
+    
+    
+    
+    var bm = new BMap.Map("allmap",{enableMapClick:false});
+    bm.centerAndZoom(new BMap.Point(116.302,39.978), 12);
+    bm.addControl(new BMap.NavigationControl()); // 添加平移缩放控件
+	//bm.addControl(new BMap.ScaleControl());                    // 添加比例尺控件
+	bm.enableScrollWheelZoom();   //启用滚轮放大缩小，默认禁用
+	//bm.enableContinuousZoom();    //启用地图惯性拖拽，默认禁用
+	
+
+/*	
+	var sy = new BMap.Symbol(BMap_Symbol_SHAPE_BACKWARD_OPEN_ARROW, {
+		scale: 0.6,//图标缩放大小
+		strokeColor:'#fff',//设置矢量图标的线填充颜色
+		strokeWeight: '2',//设置线宽
+	});
+	var icons = new BMap.IconSequence(sy, '10', '30');	
+*/
+/*
+	var point = new BMap.Point(116.302,39.978);   
+	var marker1 = new BMap.Marker(point);        // 创建标注   
+	bm.addOverlay(marker1);
+*/	
+	var polyline = new BMap.Polyline([
+		new BMap.Point(119.912, 31.915),
+		new BMap.Point(119.915, 31.920),
+		new BMap.Point(119.955, 31.925)
+	], {strokeColor:"red", strokeWeight:1, strokeOpacity:0.5,strokeStyle:"solid"});
+	bm.addOverlay(polyline);
+	
+	
+
+	
+       bm.addEventListener("click", function(e){    
+	 alert(e.point.lng + ", " + e.point.lat);   // 获取鼠标点击坐标
+	 jsClassIns.sendTextToCpp(e.point.lng, e.point.lat);
+	});
+	
+	
+        /*	
+	var p1 = new BMap.Point(116.301934,39.977552);
+        var p2 = new BMap.Point(116.508328,39.919141);
+	var marker2 = new BMap.Marker(p1);        // 创建标注   
+	bm.addOverlay(marker2);
+	var marker3 = new BMap.Marker(p2);        // 创建标注   
+	bm.addOverlay(marker3);
+	
+	var driving = new BMap.DrivingRoute(bm, {renderOptions:{map: bm, autoViewport: true}});
+        driving.search(p1, p2);
+
+	driving.setsearchcompletecallback(function(){
+	var pts = driving.getresults().getPlan(0).getRoute(0).getPath();
+	//定义折线并添加到地图上
+	var polyline1 = new BMap.polyline(pts);
+	bm.addoverlay(polyline1);
+	//1秒后调整视野
+
+	
+	});
+*/
+
+	function addMarker(lon,lat){
+		var p4 = new BMap.Point(lon,lat);
+		var marker4 = new BMap.Marker(p4);        // 创建标注   
+		bm.addOverlay(marker4);
+	}
+	function delMarker(lon,lat){
+		var allOverlay = bm.getOverlays();
+            for(var j = 0;j<allOverlay.length;j++) {
+                //删除指定经度的点
+                if (allOverlay[j].toString()=="[object Marker]" && allOverlay[j].getPosition().lng ==lon && allOverlay[j].getPosition().lat==lat ) {
+                    bm.removeOverlay(allOverlay[j]);
+                }
+            }
+	}
+	var driving = new BMap.DrivingRoute(bm, {renderOptions:{map: bm, autoViewport: true}});
+	function addDrivingRoute(startlon,startlat,endlon,endlat){
+	
+		driving.clearResults();
+		var p1 = new BMap.Point(startlon,startlat);
+	        var p2 = new BMap.Point(endlon,endlat);
+	        /*
+		var marker2 = new BMap.Marker(p1);        // 创建标注   
+		bm.addOverlay(marker2);
+		var marker3 = new BMap.Marker(p2);        // 创建标注   
+		bm.addOverlay(marker3);
+		*/
+		
+	        driving.search(p1, p2);
+	}
+	
+	
+        map.enableScrollWheelZoom(true);
+        
+
+        map.enableScrollWheelZoom(true);
+        
+        // 用经纬度设置地图中心点
+        function theLocation(lng,lat){
+                bm.clearOverlays(); 
+                var new_point = new BMap.Point(lng,lat);
+                var markernew =  new BMap.Marker(new_point);        // 创建标注   
+		   bm.addOverlay(markernew);
+		   bm.panTo(new_point);
+  	 }
+</script>
+

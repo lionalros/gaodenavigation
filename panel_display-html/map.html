@@ -1,0 +1,135 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <title>事件模拟触发</title>
+   <link rel="stylesheet" href="https://cache.amap.com/lbs/static/AMap.DrivingRender1120.css"/>
+   <link rel="stylesheet" href="https://a.amap.com/jsapi_demos/static/demo-center/css/demo-center.css" type="text/css">
+    <style>
+    html,
+    body,
+    #container {
+        width: 100%;
+        height: 100%;
+    }
+    #panel {
+        position: fixed;
+        background-color: white;
+        max-height: 90%;
+        overflow-y: auto;
+        top: 10px;
+        right: 10px;
+        width: 280px;
+    }
+    #panel .amap-lib-driving {
+   	    border-radius: 4px;
+        overflow: hidden;
+    }
+    </style>
+    <link rel="stylesheet" href="https://a.amap.com/jsapi_demos/static/demo-center/css/demo-center.css" />
+    <script src="https://a.amap.com/jsapi_demos/static/demo-center/js/demoutils.js"></script>
+    <script type="text/javascript">
+        window._AMapSecurityConfig = {
+            securityJsCode:'56f388edae5048c3b0fa39cfc13bad63',
+        }
+    </script>
+    <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=090b3590c52d46d472bf6aebf5982646&plugin=AMap.Riding"></script>
+    <script type="text/javascript" src="https://cache.amap.com/lbs/static/DrivingRender1230.js"></script>
+    <script type="text/javascript" src="https://cache.amap.com/lbs/static/addToolbar.js"></script>
+    <script src="https://a.amap.com/jsapi_demos/static/demo-center/js/demoutils.js"></script>
+</head>
+<body>
+<div id="container"></div>
+<div id="panel"></div>
+<script src="qwebchannel.js"></script>
+<script type="text/javascript">
+
+    var map = new AMap.Map("container", {
+        resizeEnable: true
+    });
+
+    var jsClassIns;
+	// 获取qt中 JsClass 类的实例
+    new QWebChannel(qt.webChannelTransport, function (channel) {
+            jsClassIns = channel.objects.jsClass;  //jsClassIns 与QT 中一致
+    });
+	/*
+    //驾车导航，您如果想修改结果展现效果，请参考页面：https://lbs.amap.com/fn/css-style/
+    var drivingOption = {
+        map: map,
+        panel: "panel",
+        policy:1
+    };
+    var driving = new AMap.Riding (drivingOption); //构造驾车导航类
+    //根据起终点坐标规划驾车路线
+    driving.search([116.397933,39.844818],[116.440655,39.878694], function(status, result){
+		if(status === 'complete' ){
+			
+            
+            log.success('绘制驾车路线完成')
+		}else{
+            log.error('获取驾车数据失败：' + result)
+        }
+	});*/
+   var clickHandler = function(e) {
+            jsClassIns.sendTextToCpp(e.lnglat.getLng(), e.lnglat.getLat());
+
+            new AMap.InfoWindow({
+                content:e.lnglat.getLng() + ',' + e.lnglat.getLat(),
+                
+            }).open(map,e.lnglat)
+        };
+    map.on('click', clickHandler);
+        map.on('complete', function() {
+            setTimeout(function(){
+                // 模拟触发地图click事件
+                map.emit('click',{
+                    lnglat : map.getCenter()
+                });
+            },2000)
+        })
+     function addMarker(lon,lat){
+		
+		var marker4 = new AMap.Marker({
+                    position:[lon,lat]});        // 创建标注   
+		map.add(marker4);
+	}
+	function delMarker(lon,lat){
+
+		var allOverlay = map.getAllOverlays();
+            for(var j = 0;j<allOverlay.length;j++) {
+                //删除指定经度的点
+                if ( allOverlay[j].getPosition().getLng() ==lon && allOverlay[j].getPosition().getLat()==lat ) {
+                    map.remove(allOverlay[j]);
+                }
+            }
+	}
+        var ridingOption = {
+        map: map,
+        panel: "panel",
+        policy:1
+        };
+        var riding =new AMap.Riding (ridingOption);
+        function addDrivingRoute(startlon,startlat,endlon,endlat)
+        {
+            var p1 = new AMap.LngLat(startlon,startlat);
+            var p2 = new AMap.LngLat(endlon,endlat);
+            riding.search(p1,p2, function(status, result){
+
+		if(status === 'complete' ){
+            log.success('绘制驾车路线完成')
+
+		}else{
+
+            log.error('获取驾车数据失败：' + result)
+
+        }
+
+	});
+        }
+
+</script>
+</body>
+</html>

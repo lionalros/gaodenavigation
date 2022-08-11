@@ -1,0 +1,13 @@
+INPUT(
+./debug\customqlabel.o
+./debug\main.o
+./debug\mainform.o
+./debug\mainwindow.o
+./debug\navigationform.o
+./debug\startupform.o
+./debug\moc_customqlabel.o
+./debug\moc_mainform.o
+./debug\moc_mainwindow.o
+./debug\moc_navigationform.o
+./debug\moc_startupform.o
+);

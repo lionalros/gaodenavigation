@@ -1,0 +1,13 @@
+INPUT(
+./release\customqlabel.o
+./release\main.o
+./release\mainform.o
+./release\mainwindow.o
+./release\navigationform.o
+./release\startupform.o
+./release\moc_customqlabel.o
+./release\moc_mainform.o
+./release\moc_mainwindow.o
+./release\moc_navigationform.o
+./release\moc_startupform.o
+);
